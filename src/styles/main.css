@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .sidebarIcon {
+    @apply relative flex items-center justify-center mx-auto text-white hover:text-gray-50 transition-all
+  }
+
+  .sidebarIcon:not(:last-child){
+    @apply mb-8
+  }
+
+  .sideBarTooltip{
+    @apply absolute w-auto p-2 m-2 min-w-max left-16 rounded-md shadow-md text-white bg-dfGrey text-xs font-bold transition-all duration-100 scale-0 origin-left
+  }
+
+  #login input[type="text"],#login input[type="password"] {
+    font-weight: 500;
+    @apply bg-zinc-100 rounded-lg p-3 text-sm w-full
+  }
+}
