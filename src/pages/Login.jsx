@@ -1,22 +1,22 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { UserContext } from "../context/UserContext";
-import { redirect } from "react-router-dom";
 import axios from "axios";
 
 export const Login = () => {
-  const { user, setUser } = useContext(UserContext);
-  const [userName, setUserName] = useState("");
+  console.log("login");
+  const { user, setUser, setAlert, setIsLoading } = useContext(UserContext);
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const [login, setLogin] = useState({ A: "A" });
-
-  const postLoginAxios = async () => {
-    axios
+  const expensesListResp = async () => {
+    setIsLoading(true);
+    console.log("EJECUCION DE LOGIN");
+    await axios
       .post(
         "http://localhost:8080/api/v1/auth/authenticate",
         {
-          email: "user@mail.com",
-          password: "password",
+          email: email.toLowerCase(),
+          password: password,
         },
         {
           headers: {
@@ -26,50 +26,32 @@ export const Login = () => {
           },
         }
       )
-      .then((res) => setLogin(res))
+      .then((response) => {
+        setUser({
+          email: email,
+          access_token: response.data.access_token,
+          refresh_token: response.data.refresh_token,
+        });
+        localStorage.setItem(
+          "login",
+          JSON.stringify({
+            email: email,
+            access_token: response.data.access_token,
+            refresh_token: response.data.refresh_token,
+          })
+        );
+        setIsLoading(false);
+      })
       .catch(function (error) {
         console.log(error);
-      });
-
-    // const data = await fetch("http://localhost:8080/api/v1/auth/authenticate", {
-    //   method: "POST",
-    //   body: JSON.stringify({ email: "user@mail.com", password: "password" }),
-    //   headers: {
-    //     Accept: "application/json",
-    //     "Content-Type": "application/json",
-    //     Cache: "no-cache",
-    //   },
-    // }).then((resp) => resp.json());
-    // console.log(data);
-  };
-
-  useEffect(() => {
-    const expensesListResp = async () => {
-      await axios
-        .post(
-          "http://localhost:8080/api/v1/auth/authenticate",
-          {
-            email: "user@mail.com",
-            password: "password",
-          },
-          {
-            headers: {
-              Accept: "application/json",
-              "Content-Type": "application/json",
-              Cache: "no-cache",
-            },
-          }
-        )
-        .then((response) => {
-          console.log(JSON.stringify(response.data));
-          setLogin(response.data);
-        })
-        .catch(function (error) {
-          console.log(error);
+        setAlert({
+          tipo: "Error al iniciar sesión",
+          mensaje: "Revisa tus credenciales",
+          hidden: false,
         });
-    };
-    expensesListResp();
-  }, []);
+        setIsLoading(false);
+      });
+  };
 
   return (
     <div id="login" className="flex">
@@ -79,23 +61,15 @@ export const Login = () => {
           className="h-2/6 w-8/12 flex flex-col items-start justify-evenly"
           onSubmit={(ev) => {
             ev.preventDefault();
-            console.log(userName);
-            setUser({ id: 1, name: "alsjdlasd" });
-            localStorage.setItem(
-              "login",
-              JSON.stringify({ id: 1, name: "alsjdlasd" })
-            );
-            document.cookie = "userId=1;SameSite=Strict";
-            document.cookie = 'userName = "alsndasd"';
-            redirect("/");
+            expensesListResp();
           }}
         >
           <h1 className="text-center">Bienvenido a Liceman</h1>
           <input
             type="text"
-            name="username"
-            value={userName}
-            onChange={(ev) => setUserName(ev.target.value)}
+            name="email"
+            value={email}
+            onChange={(ev) => setEmail(ev.target.value)}
           />
           <input
             type="password"

@@ -19,4 +19,8 @@
     font-weight: 500;
     @apply bg-zinc-100 rounded-lg p-3 text-sm w-full
   }
+
+  #alert{
+    min-width: min(25%, 300px);
+  }
 }

@@ -5,8 +5,10 @@ export default {
   theme: {
     extend: {
       colors: {
+        dfLight: "#FAFAFA",
         dfGrey: "#393939",
         dfText: "#202020",
+        dfGreyDark: "#777777",
       },
     },
   },
