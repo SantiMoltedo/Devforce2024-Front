@@ -23,4 +23,12 @@
   #alert{
     min-width: min(25%, 300px);
   }
+
+  table td[scope="col"] {
+    @apply w-1/5 py-2 px-2
+  }
+
+  table thead th{
+    @apply py-3 px-2
+  }
 }

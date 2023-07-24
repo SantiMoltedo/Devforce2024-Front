@@ -1,16 +1,18 @@
 import React, { useContext, useState } from "react";
 import { UserContext } from "../context/UserContext";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export const Login = () => {
   console.log("login");
-  const { user, setUser, setAlert, setIsLoading } = useContext(UserContext);
+  const { user, setUser, setAlert, setIsLoadingAuth } = useContext(UserContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const navigate = useNavigate()
+
   const expensesListResp = async () => {
-    setIsLoading(true);
-    console.log("EJECUCION DE LOGIN");
+    setIsLoadingAuth(true);
     await axios
       .post(
         "http://localhost:8080/api/v1/auth/authenticate",
@@ -40,7 +42,6 @@ export const Login = () => {
             refresh_token: response.data.refresh_token,
           })
         );
-        setIsLoading(false);
       })
       .catch(function (error) {
         console.log(error);
@@ -49,8 +50,8 @@ export const Login = () => {
           mensaje: "Revisa tus credenciales",
           hidden: false,
         });
-        setIsLoading(false);
       });
+      setIsLoadingAuth(false);
   };
 
   return (

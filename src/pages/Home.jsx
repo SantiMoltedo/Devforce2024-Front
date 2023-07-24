@@ -6,17 +6,17 @@ import { BsMicrosoftTeams } from "react-icons/bs";
 import { BsBell } from "react-icons/bs";
 import { TbMailPlus } from "react-icons/tb";
 import { Link } from "react-router-dom";
-import { Loader } from "../components/Loader";
 
 export const Home = () => {
-  const { userData, user, testCredentianls } = useContext(UserContext);
+  const { userData, user, testCredentianls, loadingContent, setLoadingContent } = useContext(UserContext);
 
-  const [trainings, setTrainings] = useState(null);
   const [lastTraining, setLastTraining] = useState(null);
   const [approvedTrainings, setApprovedTrainings] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
 
   const getTrainings = async () => {
+    setLoadingContent(true)
+    // setTimeout(()=> setLoadingContent(false), 2000)
     await axios
       .get(`http://localhost:8080/api/v1/users/${userData.id}`, {
         headers: {
@@ -24,26 +24,21 @@ export const Home = () => {
         },
       })
       .then((resp) => {
-        resp.status === 200
-          ? setTrainings(resp.data.contenido.trainings)
-          : null;
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.log(err);
-        testCredentianls();
-      });
+        if(resp.status === 200){
+          let trainings = resp.data.contenido.trainings
+          setLastTraining(trainings[trainings.length - 1]);
+          setApprovedTrainings(trainings.find((training) => training.approvedDate));
+        }
+        })
+        .catch((err) => {
+          console.log(err);
+          testCredentianls();
+        });
+        setLoadingContent(false)
   };
   useEffect(() => {
     getTrainings();
   }, []);
-
-  useEffect(() => {
-    if (trainings) {
-      setLastTraining(trainings[trainings.length - 1]);
-      setApprovedTrainings(trainings.find((training) => training.approvedDate));
-    }
-  }, [trainings]);
 
   const getDayTime = () => {
     let hora = new Date().getHours();
@@ -52,30 +47,31 @@ export const Home = () => {
     if (hora >= 20) return "Buenas noches";
   };
 
-  if (loading) {
+  if (loadingContent) {
     return (
-      <div className="ml-20">
+      <>
         <h1 className="text-2xl font-bold ms-4 mt-4 text-dfText">
           {getDayTime()}, {userData.firstname}
         </h1>
         <div className="mx-20 mt-10">
-          <Loader></Loader>
+          
         </div>
-      </div>
+      </>
     );
   }
+  
 
   if (lastTraining && approvedTrainings) {
     return (
-      <div className="ml-20">
+      <>
         <h1>HAY AMBAS</h1>
-      </div>
+      </>
     );
   }
 
   if (lastTraining && !approvedTrainings) {
     return (
-      <div className="ml-20">
+      <>
         <h1 className="text-2xl font-bold ms-4 mt-4 text-dfText">
           {getDayTime()}, {userData.firstname}
         </h1>
@@ -161,12 +157,12 @@ export const Home = () => {
             </div>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 
-  if (!trainings) {
-    <div className="ml-20">
+  if (!lastTraining) {
+    <>
       <h1 className="text-2xl font-bold ms-4 mt-4 text-dfText">
         {getDayTime()}, {userData.firstname}
       </h1>
@@ -183,6 +179,6 @@ export const Home = () => {
           </div>
         </div>
       </div>
-    </div>;
+    </>;
   }
 };

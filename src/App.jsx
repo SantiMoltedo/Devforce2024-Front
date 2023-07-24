@@ -11,11 +11,13 @@ import axios from "axios";
 import { Navbar } from "./components/Navbar";
 import { MisTrainings } from "./pages/MisTrainings";
 import { Layout } from "./components/Layout";
+import { Loader } from "./components/Loader";
 
 function App() {
   const [user, setUser] = useState(null);
   const [userData, setUserData] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+  const [loadingContent, setLoadingContent] = useState(false);
   const [alert, setAlert] = useState({ titulo: "", mensaje: "", hidden: true });
   //TODO: SEGUIR ACTUALIZANDO LA PAG CUANDO SEA NECESARIO
   const [acualPage, setAcualPage] = useState("Inicio");
@@ -56,7 +58,7 @@ function App() {
   };
 
   const testCredentianls = async () => {
-    setIsLoading(true);
+    setIsLoadingAuth(true);
     await axios
       .get("http://localhost:8080/api/v1/users/my-user", {
         headers: {
@@ -79,9 +81,9 @@ function App() {
           "Probando refresh token"
         );
         // refreshToken();
+        setIsLoadingAuth(false);
         logout();
       });
-    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -91,6 +93,10 @@ function App() {
       logout();
     }
   }, []);
+  
+  useEffect(() => {
+    userData ? setIsLoadingAuth(false) : null
+  }, [userData])
 
   useEffect(() => {
     // console.log(user.access_token);
@@ -106,33 +112,31 @@ function App() {
       closeAlert,
       logout,
       userData,
-      isLoading,
-      setIsLoading,
       testCredentianls,
+      loadingContent,
+      setLoadingContent,isLoadingAuth, setIsLoadingAuth
     }),
-    [user, setUser, alert, setAlert, userData, isLoading, setIsLoading]
+    [user, setUser, alert, setAlert, userData,loadingContent,isLoadingAuth]
   );
 
   return (
     <>
       <UserContext.Provider value={UserProviderValue}>
-        {isLoading ? (
-          <h1>cargando...</h1>
-        ) : (
+        {
+        isLoadingAuth ? (
+          <Loader/>
+        ) : 
+        (
           <>
             <BrowserRouter>
               <Sidebar></Sidebar> <Navbar></Navbar>
               <Routes>
-                {user ? (
+                {userData ? (
                   <>
-                    {/* INVESTIGAR SOBRE SHAREDLAYOUT https://www.youtube.com/watch?v=59IXY5IDrBA */}
                     <Route path="/" element={<Layout />}>
-                      <Route
-                        path="*"
-                        element={<Navigate to="/home" replace />}
-                      />
-                      <Route path="my-trainings" element={<MisTrainings />} />
-                      <Route path="home" element={<Home />} />
+                      <Route path="*" element={<Navigate to={"/home"}/>} />
+                      <Route path="my-trainings" element={<><MisTrainings />{loadingContent && <Loader/>}</>} />
+                      <Route path="home" element={<><Home />{loadingContent && <Loader/>}</>} />
                     </Route>
                   </>
                 ) : (
