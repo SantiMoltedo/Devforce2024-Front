@@ -20,40 +20,38 @@ export const Sidebar = () => {
         {/* <SidebarIcon icon={<FaBars size={32} />} /> */}
         <div className="userIcons">
           <Link className="sidebarIcon group" to={"/home"}>
-            <SidebarIcon tooltip={"inicio"} icon={<FaHome size={28} />} />
+            <SidebarIcon tooltip={"Inicio"} icon={<FaHome size={28} />} />
           </Link>
-          <Link className="sidebarIcon group" to={"/my-trainings"}>
-            <SidebarIcon
-              tooltip={"Mis cursos"}
-              icon={<FaBookReader size={28} />}
-            />
-          </Link>
-          <Link className="sidebarIcon group" to="">
-            <SidebarIcon
-              tooltip={"Mis solicitudes"}
-              icon={<FaEnvelope size={28} />}
-            />
-          </Link>
-          <Link className="sidebarIcon group" to="">
-            <SidebarIcon
-              tooltip={"Nueva solicitud"}
-              icon={<FaPlusCircle size={28} />}
-            />
-          </Link>
+          {userData.role === "USER" && (
+            <>
+              <Link className="sidebarIcon group" to="my-trainings">
+                <SidebarIcon
+                  tooltip={"Mis solicitudes"}
+                  icon={<FaEnvelope size={28} />}
+                />
+              </Link>
+              <Link className="sidebarIcon group" to="/create-training">
+                <SidebarIcon
+                  tooltip={"Nueva solicitud"}
+                  icon={<FaPlusCircle size={28} />}
+                />
+              </Link>
+            </>
+          )}
           {userData.role === "MENTOR" && (
             <>
-              <Link className="sidebarIcon group" to="">
+              <Link className="sidebarIcon group" to="/mentor-actions">
                 <SidebarIcon
                   tooltip={"Solicitudes"}
                   icon={<FaInbox size={28} />}
                 />
               </Link>
-              <Link className="sidebarIcon group" to="">
+              {/* <Link className="sidebarIcon group" to="">
                 <SidebarIcon
                   tooltip={"Estadisticas"}
                   icon={<FaChartBar size={28} />}
                 />
-              </Link>
+              </Link> */}
             </>
           )}
 
@@ -65,12 +63,12 @@ export const Sidebar = () => {
                   icon={<FaInbox size={28} />}
                 />
               </Link>
-              <Link className="sidebarIcon group" to="">
+              {/* <Link className="sidebarIcon group" to="">
                 <SidebarIcon
                   tooltip={"Estadisticas"}
                   icon={<FaChartBar size={28} />}
                 />
-              </Link>
+              </Link> */}
               <Link className="sidebarIcon group" to="">
                 <SidebarIcon
                   tooltip={"Licencias"}

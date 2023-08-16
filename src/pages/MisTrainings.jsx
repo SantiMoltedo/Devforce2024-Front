@@ -1,18 +1,23 @@
 import React from "react";
+import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/UserContext";
-import { IoMdArrowDown } from "react-icons/io";
-import axios from "axios";
-import { BsMicrosoftTeams } from "react-icons/bs";
+import {
+  BsChevronUp,
+  BsChevronDown,
+  BsMicrosoftTeams,
+  BsSearch,
+} from "react-icons/bs";
+
+import { sortTable } from "../helpers/sortTable";
+import { findSearch } from "../helpers/search";
+import { Link, useNavigate } from "react-router-dom";
 
 export const MisTrainings = () => {
-  //Para q el modal spawnee poner esto en los iconos/columnas q sean
-  // data-bs-toggle="modal" data-bs-target="#aprobSoli"
-
-  const [dirSort0, setDirSort0] = useState("asc");
-  const [dirSort2, setDirSort2] = useState("asc");
-
   const [trainings, setTrainings] = useState([]);
+  const [search, setSearch] = useState("");
+  const [foundTrainings, setFoundTrainings] = useState([]);
+  const navigate = useNavigate();
 
   const {
     userData,
@@ -31,11 +36,29 @@ export const MisTrainings = () => {
         },
       })
       .then((resp) => {
-        resp.status === 200
-          ? setTrainings(resp.data.contenido.trainings)
-          : null;
+        let asd = resp.data.contenido.trainings;
+        asd.forEach((training) => {
+          delete training.userId;
+          training.status = training.status.replace("_", " ");
+          training.creationDate = training.creationDate.slice(0, -16);
+          training.creationDate = `${training.creationDate.substring(
+            8,
+            10
+          )}-${training.creationDate.substring(
+            5,
+            7
+          )}-${training.creationDate.substring(0, 4)}`;
+
+          if (training.mentorId) {
+            training.mentorId.name = `${training.mentorId.firstname} ${training.mentorId.lastname}`;
+            delete training.mentorId.role;
+          }
+        });
+
+        localStorage.setItem("trainings", JSON.stringify(asd));
+        resp.status === 200 ? setTrainings(asd) : null;
         setLoadingContent(false);
-        console.log(resp.data.contenido.trainings);
+        console.log(asd);
       })
       .catch((err) => {
         console.log(err);
@@ -48,69 +71,252 @@ export const MisTrainings = () => {
     getTrainings();
   }, []);
 
-  if (loadingContent) {
+  useEffect(() => {
+    setFoundTrainings(findSearch(trainings, search));
+  }, [search]);
+  if (!loadingContent)
     return (
-      <>
-        <h1>aljksdhkjsahd</h1>
-      </>
-    );
-  }
-  return (
-    <div className="mt-10">
-      <div className="w-[90%] mx-auto rounded-lg overflow-hidden">
-        <table class="w-full text-sm text-left text-gray-500">
-          <thead class="text-xs text-gray-700 uppercase bg-gray-100">
-            <tr>
-              <th scope="col" className="py-3">
-                <div>Área</div>
-              </th>
-              <th scope="col" className="py-3">
-                <div>Descripción</div>
-              </th>
-              <th scope="col" className="py-3">
-                <div className="">Estado</div>
-              </th>
-              <th scope="col" className="py-3">
-                <div>Mentor</div>
-              </th>
-              <th scope="col" className="py-3">
-                <div>Creada el</div>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {trainings.map((soli) => (
-              <tr key={soli.id} className="bg-white border-b">
-                <td scope="col">
-                  <span>{soli.area}</span>
-                </td>
-                <td scope="col">
-                  <span>{soli.userComment}</span>
-                </td>
-                <td scope="col">
-                  <span>{soli.status}</span>
-                </td>
-                <td scope="col">
-                  {soli.mentorId ? (
-                    <span>
-                      {`${soli.mentorId.firstname}, ${soli.mentorId.lastname}`}
-                      <BsMicrosoftTeams
-                        size={22}
-                        color="#333"
-                      ></BsMicrosoftTeams>
-                    </span>
+      <div className="mt-10 mb-20">
+        <div className="w-[90%] mx-auto">
+          <div className="rounded-lg overflow-hidden border">
+            <div className="w-full text-gray-700 uppercase bg-gray-100 p-2 flex justify-between border-b items-center text-sm">
+              <div className="flex gap-4">
+                <button className="border border-neutral-500 rounded-md p-2">
+                  next page
+                </button>
+                <button className="border border-neutral-500 rounded-md p-2">
+                  previus page
+                </button>
+              </div>
+              <label className="relative text-gray-400 focus-within:text-gray-600 block h-fit">
+                <BsSearch
+                  className="pointer-events-none absolute top-1/2 transform -translate-y-1/2 left-3 text-neutral-500"
+                  size={16}
+                />
+                <input
+                  type="text"
+                  name="search-training"
+                  className="form-input w-full bg-white border border-neutral-500 rounded-md p-1 ps-8"
+                  value={search}
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                  }}
+                />
+              </label>
+            </div>
+            <table
+              className="w-full text-sm text-left text-gray-500"
+              id="user-trainings-table"
+            >
+              <thead className="text-sm text-gray-700 uppercase bg-gray-100">
+                <tr>
+                  <th scope="col">
+                    <div className="flex gap-2 items-center">
+                      Área
+                      <div className="flex flex-col">
+                        <button
+                          className="hover:text-gray-400 order-table"
+                          onClick={(e) => sortTable(0, "asc", e.target)}
+                        >
+                          <BsChevronUp size={12} />
+                        </button>
+                        <button
+                          className="hover:text-gray-400 order-table"
+                          onClick={(e) => sortTable(0, "desc", e.target)}
+                        >
+                          <BsChevronDown size={12} />
+                        </button>
+                      </div>
+                    </div>
+                  </th>
+                  <th scope="col">
+                    <div>Descripción</div>
+                  </th>
+                  <th scope="col">
+                    <div>Link</div>
+                  </th>
+                  <th scope="col">
+                    <div className="flex gap-2 items-center">
+                      Estado
+                      <div className="flex flex-col">
+                        <button
+                          className="hover:text-gray-400 order-table"
+                          onClick={(e) => sortTable(2, "asc", e.target)}
+                        >
+                          <BsChevronUp size={12} />
+                        </button>
+                        <button
+                          className="hover:text-gray-400 order-table"
+                          onClick={(e) => sortTable(2, "desc", e.target)}
+                        >
+                          <BsChevronDown size={12} />
+                        </button>
+                      </div>
+                    </div>
+                  </th>
+                  <th scope="col">
+                    <div>Mentor</div>
+                  </th>
+                  <th scope="col">
+                    <div className="flex gap-2 items-center">
+                      Creada el
+                      <div className="flex flex-col">
+                        <button
+                          className="hover:text-gray-400 order-table"
+                          onClick={(e) => sortTable(4, "asc", e.target)}
+                        >
+                          <BsChevronUp size={12} />
+                        </button>
+                        <button
+                          className="hover:text-gray-400 order-table"
+                          onClick={(e) => sortTable(4, "desc", e.target)}
+                        >
+                          <BsChevronDown size={12} />
+                        </button>
+                      </div>
+                    </div>
+                  </th>
+                  <th scope="col" className="actions">
+                    -
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {trainings.length > 0 ? (
+                  foundTrainings ? (
+                    foundTrainings.map((soli) => (
+                      <tr
+                        key={soli.id}
+                        className={`bg-white${
+                          soli.status == "PENDIENTE USER" ? "" : " border-b"
+                        }`}
+                        onClick={() => {
+                          navigate(`/training/${soli.id}`);
+                        }}
+                      >
+                        <td scope="col">
+                          <span>{soli.area}</span>
+                        </td>
+                        <td scope="col">
+                          <span>
+                            Esperar el cambi del back de tiutulo
+                            {/* {soli.userComment} */}
+                          </span>
+                        </td>
+                        <td scope="col">
+                          <span>{soli.status}</span>
+                        </td>
+                        <td scope="col">
+                          {soli.mentorId ? (
+                            <span className="flex gap-2">
+                              <BsMicrosoftTeams
+                                size={22}
+                                color="#333"
+                              ></BsMicrosoftTeams>
+                              {`${soli.mentorId.firstname}, ${soli.mentorId.lastname}`}
+                            </span>
+                          ) : (
+                            "-"
+                          )}
+                        </td>
+                        <td scope="col">
+                          <span>{soli.creationDate}</span>
+                        </td>
+                      </tr>
+                    ))
                   ) : (
-                    "-"
-                  )}
-                </td>
-                <td scope="col">
-                  <span>{soli.creationDate}</span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                    trainings.map((soli) => (
+                      <>
+                        <tr key={soli.id} className={`bg-white border-b`}>
+                          <td scope="col">
+                            <span>{soli.area}</span>
+                          </td>
+                          <td scope="col">
+                            <span>{soli.title}</span>
+                          </td>
+                          <td scope="col">
+                            {soli.link ? (
+                              <a className="underline" href={soli.link}>
+                                {soli.link}
+                              </a>
+                            ) : (
+                              <span>-</span>
+                            )}
+                          </td>
+                          <td scope="col">
+                            <span>{soli.status}</span>
+                          </td>
+                          <td scope="col">
+                            <span>
+                              {soli.mentorId ? (
+                                <div className="flex gap-1">
+                                  {soli.mentorId.hasTeams && (
+                                    <a
+                                      href={`https://teams.microsoft.com/l/chat/0/0?users=${soli.mentorId.email}`}
+                                    >
+                                      <BsMicrosoftTeams
+                                        size={22}
+                                        color="#333"
+                                      ></BsMicrosoftTeams>
+                                    </a>
+                                  )}
+                                  <span>
+                                    {soli.mentorId.firstname +
+                                      soli.mentorId.lastname}
+                                  </span>
+                                </div>
+                              ) : (
+                                "-"
+                              )}
+                            </span>
+                          </td>
+                          <td scope="col">
+                            <span>{soli.creationDate}</span>
+                          </td>
+                          <td className="actions" scope="col">
+                            <button
+                              className="button-outline"
+                              onClick={() => {
+                                navigate(`/training/${soli.id}`);
+                              }}
+                            >
+                              Ver
+                            </button>
+                          </td>
+                        </tr>
+                      </>
+                    ))
+                  )
+                ) : search ? (
+                  <tr>
+                    <td>
+                      <h1>
+                        Parece que no hay solcitudes que coincidan con tu
+                        busqueda
+                      </h1>
+                    </td>
+                  </tr>
+                ) : (
+                  <tr>
+                    <td colSpan={6}>
+                      <div className="flex justify-start gap-4 items-center">
+                        <h1 className="text-lg">
+                          Parece que no hay solcitudes...
+                        </h1>
+                        <Link
+                          to={"/create-training"}
+                          className="m-2 text-lg button-outline"
+                        >
+                          Creá una acá
+                        </Link>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
-    </div>
-  );
+    );
 };

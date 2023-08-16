@@ -4,19 +4,25 @@ import axios from "axios";
 
 import { BsMicrosoftTeams } from "react-icons/bs";
 import { BsBell } from "react-icons/bs";
+import { BsClock } from "react-icons/bs";
 import { TbMailPlus } from "react-icons/tb";
 import { Link } from "react-router-dom";
+import { PiSmileySadBold } from "react-icons/pi";
 
 export const Home = () => {
-  const { userData, user, testCredentianls, loadingContent, setLoadingContent } = useContext(UserContext);
+  const {
+    userData,
+    user,
+    testCredentianls,
+    loadingContent,
+    setLoadingContent,
+  } = useContext(UserContext);
 
   const [lastTraining, setLastTraining] = useState(null);
   const [approvedTrainings, setApprovedTrainings] = useState(null);
-  // const [loading, setLoading] = useState(true);
 
   const getTrainings = async () => {
-    setLoadingContent(true)
-    // setTimeout(()=> setLoadingContent(false), 2000)
+    setLoadingContent(true);
     await axios
       .get(`http://localhost:8080/api/v1/users/${userData.id}`, {
         headers: {
@@ -24,18 +30,22 @@ export const Home = () => {
         },
       })
       .then((resp) => {
-        if(resp.status === 200){
-          let trainings = resp.data.contenido.trainings
+        if (resp.status === 200) {
+          let trainings = resp.data.contenido.trainings;
+          console.log(resp.data.contenido.trainings);
           setLastTraining(trainings[trainings.length - 1]);
-          setApprovedTrainings(trainings.find((training) => training.approvedDate));
+          setApprovedTrainings(
+            trainings.find((training) => training.approvedDate)
+          );
         }
-        })
-        .catch((err) => {
-          console.log(err);
-          testCredentianls();
-        });
-        setLoadingContent(false)
+      })
+      .catch((err) => {
+        console.log(err);
+        testCredentianls();
+      });
+    setLoadingContent(false);
   };
+
   useEffect(() => {
     getTrainings();
   }, []);
@@ -53,13 +63,10 @@ export const Home = () => {
         <h1 className="text-2xl font-bold ms-4 mt-4 text-dfText">
           {getDayTime()}, {userData.firstname}
         </h1>
-        <div className="mx-20 mt-10">
-          
-        </div>
+        <div className="mx-20 mt-10"></div>
       </>
     );
   }
-  
 
   if (lastTraining && approvedTrainings) {
     return (
@@ -78,9 +85,12 @@ export const Home = () => {
         <div className="grid grid-cols-2 px-10 pt-6 gap-10">
           <div className="w-full rounded-lg shadow-lg px-6 py-4">
             <div className="flex items-baseline gap-2">
-              <BsBell size={28} color="#333" />
+              <BsClock size={28} color="#333" />
               <h2 className="font-bold text-xl mb-2">
-                Sobre tu última solicitud pendiente:
+                <span className="underline">
+                  Sobre tu última solicitud pendiente
+                </span>
+                : {lastTraining.title}
               </h2>
             </div>
             <div className="">
@@ -100,7 +110,8 @@ export const Home = () => {
                   </span>
                 </li>
                 <li className="pb-1">
-                  <b>Tu comentario:</b> <span>{lastTraining.userComment}</span>
+                  <b>Tu comentario:</b>{" "}
+                  <span>{lastTraining.comments[0].message}</span>
                 </li>
                 {lastTraining.mentorId ? (
                   <>
@@ -151,7 +162,7 @@ export const Home = () => {
               </h2>
             </div>
             <div className="pt-8 flex justify-center items-center">
-              <Link to={"/solicitudes"} className="bg-teal-400 p-2 rounded-lg">
+              <Link to={"/my-trainings"} className="bg-teal-400 p-2 rounded-lg">
                 Revisá tus peticiones
               </Link>
             </div>
@@ -162,23 +173,26 @@ export const Home = () => {
   }
 
   if (!lastTraining) {
-    <>
-      <h1 className="text-2xl font-bold ms-4 mt-4 text-dfText">
-        {getDayTime()}, {userData.firstname}
-      </h1>
-      <div className="ml-20 flex justify-center">
-        <div className="w-4/6 rounded-lg overflow-hidden shadow-lg px-6 py-4">
-          <BsBell size={28} color="#333" />
-          <div className="">
-            <div className="font-bold text-xl mb-2">
-              No tenes solicitudes...
-            </div>
-            <Link to={"/crearSolicitud"} className="text-gray-700 text-base">
-              Crea a una haciendo click acá
+    return (
+      <>
+        <h1 className="text-2xl font-bold ms-4 mt-4 text-dfText">
+          {getDayTime()}, {userData.firstname}
+        </h1>
+        <div className="p-10 pt-8">
+          <div className="flex items-center gap-2">
+            <PiSmileySadBold size={32} color="#333"></PiSmileySadBold>
+            <h2 className="font-semibold text-xl ">No tenes solicitudes...</h2>
+          </div>
+          <div className="pt-2 pb-2 ms-8 flex justify-start items-center">
+            <Link
+              to={"/create-training"}
+              className="button-outline border-neutral-500"
+            >
+              Crea una nueva desde acá
             </Link>
           </div>
         </div>
-      </div>
-    </>;
+      </>
+    );
   }
 };

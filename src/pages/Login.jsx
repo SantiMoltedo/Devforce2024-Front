@@ -1,15 +1,15 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/UserContext";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 export const Login = () => {
-  console.log("login");
-  const { user, setUser, setAlert, setIsLoadingAuth } = useContext(UserContext);
+  const { setUser, setAlert, setIsLoadingAuth, isLoadingAuth } =
+    useContext(UserContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const navigate = useNavigate()
+  const nav = useNavigate();
 
   const expensesListResp = async () => {
     setIsLoadingAuth(true);
@@ -46,12 +46,14 @@ export const Login = () => {
       .catch(function (error) {
         console.log(error);
         setAlert({
-          tipo: "Error al iniciar sesión",
+          tipo: "error",
+          titulo: "Error al iniciar sesión",
           mensaje: "Revisa tus credenciales",
           hidden: false,
         });
       });
-      setIsLoadingAuth(false);
+    setIsLoadingAuth(false);
+    nav("/home");
   };
 
   return (

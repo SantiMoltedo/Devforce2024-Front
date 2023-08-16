@@ -5,9 +5,7 @@ export const SidebarIcon = ({ icon, className = "", tooltip }) => {
     <div className={`sidebarIcon group ${className}`}>
       {icon}
       {tooltip ? (
-        <span className="sideBarTooltip group-hover:scale-100 capitalize">
-          {tooltip}
-        </span>
+        <span className="sideBarTooltip group-hover:scale-100">{tooltip}</span>
       ) : null}
     </div>
   );

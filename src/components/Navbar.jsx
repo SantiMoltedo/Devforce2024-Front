@@ -10,16 +10,24 @@ export const Navbar = ({ titulo }) => {
         <img src={logoLiceman} alt="" className="w-40 h-12" />
         {/* <h1 className="font-bold text-xl">{titulo}</h1> */}
         {/* TODO: VER QUE PONER ACA!!!! */}
-        <div className="rounded-full h-14 aspect-square bg-dfLight border-dfGreyDark border flex justify-center items-center">
-          <span className="flex w-full gap-1 justify-center">
-            <h1 className="text-2xl leading-5">
-              {userData.firstname.charAt(0)}
-            </h1>
-            <h1 className="text-2xl leading-5">
-              {userData.lastname.charAt(0)}
-            </h1>
-          </span>
-        </div>
+        <a href="/profile">
+          <div className="rounded-full h-14 aspect-square bg-dfLight border-dfGreyDark border flex justify-center items-center">
+            <span className="flex w-full gap-1 justify-center overflow-hidden">
+              {userData.avatar ? (
+                <img src={logoLiceman} />
+              ) : (
+                <>
+                  <span className="text-2xl leading-5">
+                    {userData.firstname.charAt(0)}
+                  </span>
+                  <span className="text-2xl leading-5">
+                    {userData.lastname.charAt(0)}
+                  </span>
+                </>
+              )}
+            </span>
+          </div>
+        </a>
       </div>
     );
   }
