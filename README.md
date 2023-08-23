@@ -4,6 +4,7 @@ Bienvenidos al front del proyecto de devforce 2024!
 En este proyecto se van a encontrar un frontend desarrollado en el framweork React
 
 ## Como levantar el proyecto?
+(con el repo ya clonado)
 Para levantar el proyecto hay que seguir los siguientes pasos:
 1. Instalar yarn mediante la consola. (Es un gestor de paquetes como NPM, es como un repositorio de librerias basicamente)
 ```
