@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
-import { BsMicrosoftTeams } from "react-icons/bs";
+import { MicrosoftTeamsLogo } from "@phosphor-icons/react";
 
 export const Training = () => {
   let { trainingId } = useParams();
@@ -98,13 +98,15 @@ export const Training = () => {
         ? (body = { status: "APROBADA" })
         : (body = { status: "RECHAZADA" });
     }
-    console.log(body);
+    console.log(
+      `http://localhost:8080/api/v1/trainings/${id}/${userData.role.toLowerCase()}`,
+      body,
+      "Bearer " + user.access_token
+    );
     axios
       .put(
         `http://localhost:8080/api/v1/trainings/${id}/${userData.role.toLowerCase()}`,
-        {
-          ...body,
-        },
+        body,
         {
           headers: {
             Authorization: "Bearer " + user.access_token,
@@ -117,6 +119,7 @@ export const Training = () => {
       })
       .catch((err) => {
         console.log(err);
+        testCredentianls();
       });
   };
 
@@ -127,157 +130,201 @@ export const Training = () => {
   if (training && !loadingContent)
     return (
       <>
-        <h1 className="text-3xl font-bold ms-4 mt-4 mb-4 text-dfText text-center">
-          {training.title}
-        </h1>
-        <div className="content px-20">
-          <div className="info">
-            <h2>Training de área: {training.area.toLowerCase()}</h2>
-            {userData.role === "USER" ? null : (
-              <h3>
-                Ceada por:{" "}
-                {training.userId.firstname + training.userId.lastname}
-              </h3>
-            )}
-            <p>
-              Estado actual:{" "}
-              <span className="capitalize">{training.status}</span>
-            </p>
-            <p>Creada el: {training.creationDate}</p>
-            {training.endDate && <p>Termina el: {training.endDate}</p>}
-            <div className="flex gap-1">
-              Mentor:{" "}
-              {training.mentorId ? (
+        <div className="mx-10">
+          <h1 className="title text-secondary my-8 text-[28px]">
+            {training.title}
+          </h1>
+          <div className="flex">
+            <div className="info flex-1">
+              <div className="text-dfText text-[15px] leading-6">
+                <p>
+                  <b>Training del área:</b> {training.area.toLowerCase()}
+                </p>
+                <p>
+                  <b>Ceada por: </b>
+                  {training.userId.firstname + " " + training.userId.lastname}
+                </p>
+                <p>
+                  <b>Estado actual: </b>
+                  <span className="capitalize">{training.status}</span>
+                </p>
+                <p>
+                  <b>Creada el: </b>
+                  {training.creationDate}
+                </p>
                 <div className="flex gap-1">
-                  {training.mentorId.hasTeams && (
-                    <a
-                      href={`https://teams.microsoft.com/l/chat/0/0?users=${training.mentorId.email}`}
-                    >
-                      <BsMicrosoftTeams
-                        size={22}
-                        color="#333"
-                      ></BsMicrosoftTeams>
-                    </a>
+                  <b>Mentor: </b>
+                  {training.mentorId ? (
+                    <div className="flex gap-1">
+                      {training.mentorId.hasTeams && (
+                        <a
+                          href={`https://teams.microsoft.com/l/chat/0/0?users=${training.mentorId.email}`}
+                        >
+                          <MicrosoftTeamsLogo
+                            size={22}
+                            color="#333"
+                          ></MicrosoftTeamsLogo>
+                        </a>
+                      )}
+                      <span>
+                        {training.mentorId.firstname +
+                          training.mentorId.lastname}
+                      </span>
+                    </div>
+                  ) : (
+                    <span>Aún no hay mentor asignado...</span>
                   )}
-                  <span>
-                    {training.mentorId.firstname + training.mentorId.lastname}
-                  </span>
                 </div>
-              ) : (
-                "Aún no hay mentor asignado..."
-              )}
-            </div>
-            <div className="flex gap-1">
-              Administrador:{" "}
-              {training.adminId ? (
                 <div className="flex gap-1">
-                  {training.adminId.hasTeams && (
-                    <a
-                      href={`https://teams.microsoft.com/l/chat/0/0?users=${training.adminId.email}`}
-                    >
-                      <BsMicrosoftTeams
-                        size={22}
-                        color="#333"
-                      ></BsMicrosoftTeams>
-                    </a>
+                  <b>Administrador: </b>
+                  {training.adminId ? (
+                    <div className="flex gap-1">
+                      {training.adminId.hasTeams && (
+                        <a
+                          href={`https://teams.microsoft.com/l/chat/0/0?users=${training.adminId.email}`}
+                        >
+                          <MicrosoftTeamsLogo
+                            size={22}
+                            color="#333"
+                          ></MicrosoftTeamsLogo>
+                        </a>
+                      )}
+                      <span>
+                        {training.adminId.firstname + training.adminId.lastname}
+                      </span>
+                    </div>
+                  ) : (
+                    <span>Aún no hay administrador asignado...</span>
                   )}
-                  <span>
-                    {training.adminId.firstname + training.adminId.lastname}
-                  </span>
                 </div>
-              ) : (
-                "Aún no hay administrador asignado..."
-              )}
-            </div>
-            <p>
-              Link al curso:{" "}
-              {training.link ? (
-                <a className="underline" href={training.link}>
-                  {training.link}
-                </a>
-              ) : (
-                "Aún no hay link..."
-              )}
-            </p>
-          </div>
-          <div className="comments w-1/2 px-10 flex flex-col gap-6">
-            {training.comments.map((comment) => {
-              return (
-                <div
-                  key={comment.id}
-                  className="comment border border-dfGrey p-4 flex flex-col"
-                >
-                  <span>{comment.userName}:</span>
-                  <span className="ps-2">{comment.message}</span>
-                  <span className="">{comment.created_at}</span>
-                </div>
-              );
-            })}
-          </div>
-          {training.status == `pendiente ${userData.role.toLowerCase()}` && (
-            <form
-              className="acciones mt-10"
-              onSubmit={(ev) => ev.preventDefault()}
-            >
-              {userData.role == "MENTOR" && (
-                <>
-                  <label className="w-[500px] flex flex-col justify-between">
-                    Comentario:
-                    <input
-                      type="text"
-                      name="comment"
-                      value={comment}
-                      placeholder="Adjunto el link al curso..."
-                      required
-                      onChange={(ev) => {
-                        setComment(ev.target.value);
-                      }}
-                    />
-                  </label>
-                  <label className="w-[500px] flex flex-col justify-between">
-                    Link al curso:
-                    <input
-                      type="text"
-                      name="link"
-                      value={link}
-                      placeholder="https://gire.udemy.com/course/usecases/"
-                      required
-                      onChange={(ev) => {
-                        setLink(ev.target.value);
-                      }}
-                    />
-                  </label>
-                  <label className="w-[500px] flex flex-col justify-between">
-                    Dias para realizar el curso:
-                    <input
-                      type="number"
-                      name="days"
-                      value={days}
-                      placeholder=""
-                      onChange={(ev) => {
-                        setDays(ev.target.value);
-                      }}
-                    />
-                  </label>
-                </>
-              )}
-              <div className="flex justify-around w-[500px]">
-                <button
-                  className="button-outline"
-                  onClick={() => modifyTraining(training.id, "accept")}
-                >
-                  APROBAR
-                </button>
-                <button
-                  className="button-outline"
-                  onClick={() => modifyTraining(training.id, "reject")}
-                >
-                  RECHAZAR
-                </button>
+                <p>
+                  <b>Link al curso: </b>
+                  {training.link ? (
+                    <a className="underline" href={training.link}>
+                      {training.link}
+                    </a>
+                  ) : (
+                    "Aún no hay link..."
+                  )}
+                </p>
               </div>
-            </form>
-          )}
+              <div className="comments max-w-xl ps-10 flex flex-col gap-6 mt-8">
+                {training.comments.map((comment) => {
+                  return (
+                    <div
+                      key={comment.id}
+                      className="bg-white rounded-[15px] shadow px-[18px] pt-[14px] pb-9 relative flex flex-col text-[15px] font-normal leading-tight"
+                    >
+                      <span className="capitalize text-primary text-[15px] font-medium leading-tight">
+                        {comment.userName}:
+                      </span>
+                      <span className="pb-5">{comment.message}</span>
+                      <span className="absolute bottom-4 left-[18px] text-neutral-400">
+                        {comment.created_at}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+              {training.status == `pendiente ${userData.role.toLowerCase()}` &&
+                userData.role !== "MENTOR" && (
+                  <div className="mt-8 max-w-xl flex justify-end gap-4 mb-16">
+                    <button
+                      className="button-secondary"
+                      onClick={() => modifyTraining(training.id, "reject")}
+                    >
+                      RECHAZAR
+                    </button>
+                    <button
+                      className="button-primary"
+                      onClick={() => modifyTraining(training.id, "accept")}
+                    >
+                      APROBAR
+                    </button>
+                  </div>
+                )}
+            </div>
+            {training.status == `pendiente ${userData.role.toLowerCase()}` &&
+            userData.role === "MENTOR" ? (
+              <div className="flex-1">
+                <form
+                  className="acciones bg-white rounded-[15px] shadow w-fit py-10 px-12 mx-auto"
+                  onSubmit={(ev) => ev.preventDefault()}
+                >
+                  {userData.role == "MENTOR" && (
+                    <>
+                      <label className="w-[400px] flex flex-col justify-between gap-2">
+                        Comentario:
+                        <input
+                          type="text"
+                          name="comment"
+                          value={comment}
+                          placeholder="Adjunto el link al curso..."
+                          required
+                          onChange={(ev) => {
+                            setComment(ev.target.value);
+                          }}
+                        />
+                      </label>
+                      <label className="w-[400px] flex flex-col justify-between gap-2">
+                        Link al curso:
+                        <input
+                          type="text"
+                          name="link"
+                          value={link}
+                          placeholder="https://gire.udemy.com/course/usecases/"
+                          required
+                          onChange={(ev) => {
+                            setLink(ev.target.value);
+                          }}
+                        />
+                      </label>
+                      <label className="w-[400px] flex flex-col justify-between gap-2">
+                        Dias para realizar el curso:
+                        <input
+                          type="number"
+                          name="days"
+                          value={days}
+                          placeholder=""
+                          onChange={(ev) => {
+                            setDays(ev.target.value);
+                          }}
+                        />
+                      </label>
+                      <div className="mt-8 flex justify-end gap-4 mb-16">
+                        <button
+                          className="button-secondary"
+                          onClick={() => modifyTraining(training.id, "reject")}
+                        >
+                          RECHAZAR
+                        </button>
+                        <button
+                          className="button-primary"
+                          onClick={() => modifyTraining(training.id, "accept")}
+                        >
+                          APROBAR
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </form>
+              </div>
+            ) : null}
+          </div>
         </div>
+        {userData.role === "MENTOR" ? (
+          <img
+            className="absolute bottom-0 right-0 z-[-1] w-full"
+            src="/src/assets/icons/bg-misc-profile.svg"
+            alt=""
+          />
+        ) : (
+          <img
+            className="absolute top-0 right-0 z-[-1] h-full"
+            src="/src/assets/icons/bg-misc-training.svg"
+            alt=""
+          />
+        )}
       </>
     );
 };

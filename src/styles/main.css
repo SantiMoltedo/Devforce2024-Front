@@ -3,77 +3,191 @@
 @tailwind utilities;
 
 @layer components {
+  #root{
+    position: relative;
+    min-height: 100dvh;
+  }
+  html{
+    @apply font-display;
+  }
+
+  label, p,a{
+    @apply text-dfText
+  }
+
   .sidebarIcon {
-    @apply relative flex items-center justify-center mx-auto text-white hover:text-gray-50 transition-all
+    @apply relative flex items-center justify-center mx-auto text-white hover:text-gray-50 transition-all;
   }
 
-  .sidebarIcon:not(:last-child){
-    @apply mb-8
+  .sidebarIcon:not(:last-child) {
+    @apply mb-8;
   }
 
-  .sideBarTooltip{
-    @apply absolute w-auto p-2 m-2 min-w-max left-16 rounded-md shadow-md text-white bg-dfGrey text-xs font-bold transition-all duration-100 scale-0 origin-left
+  .sideBarTooltip {
+    @apply absolute w-auto p-2 m-2 min-w-max left-16 rounded-md shadow-md text-white bg-dfGrey text-xs font-bold transition-all duration-100 scale-0 origin-left;
   }
 
-  #login input[type="text"],#login input[type="password"] {
+  #login input[type="text"],
+  #login input[type="password"] {
     font-weight: 500;
-    @apply bg-zinc-100 rounded-lg p-3 text-sm w-full
+    @apply bg-zinc-100 rounded-lg p-3 text-sm w-full;
   }
 
-  #alert{
+  #alert {
     min-width: min(25%, 300px);
   }
 
-  table td[scope="col"], table thead th[scope="col"] {
-    @apply w-1/6 max-w-sm py-2 px-2 overflow-hidden text-ellipsis
+  table.admin-table td[scope="col"],
+  table.admin-table thead th[scope="col"] {
+    @apply w-[14%];
   }
 
-  table td.actions, table thead th.actions{
-    @apply text-center
+  table.licences-table td[scope="col"],
+  table.licences-table thead th[scope="col"] {
+    @apply w-[30%];
   }
 
-  table thead th{
-    @apply py-3 px-2
+  table td[scope="col"],
+  table thead th[scope="col"] {
+    overflow: hidden;
+    white-space: nowrap;
+    @apply w-1/6 max-w-[100px] py-2 px-2 overflow-hidden text-ellipsis;
   }
 
-  table thead th button.order-table[selected=""]{
-    @apply text-gray-400
+  table td.actions,
+  table thead th.actions {
+    @apply text-center;
   }
 
-  #crear-solicitud input, #crear-solicitud select, .acciones input{
-    @apply border border-neutral-300 rounded-md p-2 mb-10 bg-white
+  table thead th {
+    @apply py-3 px-2;
   }
 
-  #crear-solicitud select[value='DATA']{
-    @apply text-red-700
+  table thead th button.order-table[selected=""] {
+    @apply text-gray-400;
   }
 
-  #crear-solicitud label:first-child{
-      @apply mt-4
-    }
-  #crear-solicitud label span{
-    @apply text-lg underline font-semibold
+  textarea{ resize: none;}
+
+  #crear-solicitud input,#crear-usuario input, .user input,
+  #crear-solicitud select,#crear-usuario select,#crear-solicitud textarea,
+  .acciones input {
+    @apply p-2.5 bg-zinc-100 rounded-xl text-sm font-normal;
+  }
+  .user input{
+    @apply mb-0
   }
 
-  form.acciones input{
-    @apply mb-4
+  select {
+  border-right: 12px solid transparent
+}
+
+  #crear-solicitud input,#crear-solicitud select,#crear-solicitud textarea{
+    @apply mb-5
   }
 
-  .button-outline{
-    @apply bg-white border rounded-lg p-2 border-neutral-300 hover:bg-neutral-200 transition-all duration-200
+  .acciones label{
+    @apply text-neutral-800 text-base font-medium ;
   }
 
-  .modal{
+  #crear-solicitud label:first-child {
+    @apply mt-4;
+  }
+  #crear-usuario label{
+    @apply flex flex-col flex-1
+  }
+  #crear-solicitud label span,#crear-usuario label span {
+    @apply text-lg font-semibold;
+  }
+
+  form.acciones input {
+    @apply mb-4;
+  }
+
+  .button-outline {
+    @apply bg-white border rounded-lg p-2 border-neutral-300 hover:bg-neutral-200 transition-all duration-200;
+  }
+
+  .button-primary{
+    padding: 10px 12px;
+    text-align: center;
+    line-height: normal;
+    @apply bg-primary text-white rounded-[10px] font-medium
+  }
+  .button-primary:hover{
+    background-color: #00a8f0;
+  }
+
+  .button-secondary{
+    padding: 10px 12px;
+    text-align: center;
+    line-height: normal;
+    @apply border border-primary text-primary rounded-[10px] font-medium
+  }
+  .button-secondary:hover{
+    @apply bg-neutral-50
+  }
+
+  .modal {
     top: 50%;
     left: 50%;
-    transform: translate(-50%,-60%);
+    transform: translate(-50%, -60%);
   }
 
-  .backdrop{
+  .backdrop {
     position: fixed;
     inset: 0 0;
     height: 200vh;
     width: 100vw;
-    background-color: rgba(0,0,0,.5);
+    background-color: rgba(0, 0, 0, 0.5);
   }
+
+  .image-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    @apply w-[100dvw];
+  }
+
+  .crop-container .reactEasyCrop_Container {
+    position: relative !important;
+    height: 80dvh;
+  }
+
+  .controls{
+    @apply w-full h-[100dvh] bg-[rgba(0,0,0,.5)];
+  }
+  .controls .inputs{
+    @apply flex justify-center;
+  }
+
+  .avatar-button-img{
+    @apply absolute h-10 w-10 flex justify-center items-center bottom-1 right-1 bg-violet-100 rounded-full border border-white
+  }
+
+  .trainings{
+    @apply w-full flex items-center flex-col
+  }
+
+  .trainings .card{
+    @apply w-1/2 bg-white rounded-[15px] shadow p-5 my-4
+  }
+
+  .title{
+    @apply text-2xl font-bold mt-4 text-dfText
+  }
+
+
+
+  /* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
 }

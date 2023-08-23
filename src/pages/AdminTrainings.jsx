@@ -1,24 +1,17 @@
-import React from "react";
-import axios from "axios";
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/UserContext";
+import axios from "axios";
 import {
   BsChevronUp,
   BsChevronDown,
   BsMicrosoftTeams,
   BsSearch,
 } from "react-icons/bs";
-
+import { Link, useNavigate } from "react-router-dom";
 import { sortTable } from "../helpers/sortTable";
 import { findSearch } from "../helpers/search";
-import { Link, useNavigate } from "react-router-dom";
 
-export const MisTrainings = () => {
-  const [trainings, setTrainings] = useState([]);
-  const [search, setSearch] = useState("");
-  const [foundTrainings, setFoundTrainings] = useState([]);
-  const navigate = useNavigate();
-
+export const AdminTrainings = () => {
   const {
     userData,
     user,
@@ -27,18 +20,23 @@ export const MisTrainings = () => {
     setLoadingContent,
   } = useContext(UserContext);
 
+  const [trainings, setTrainings] = useState([]);
+  const [search, setSearch] = useState("");
+  const [foundTrainings, setFoundTrainings] = useState();
+
+  const navigate = useNavigate();
+
   const getTrainings = async () => {
     setLoadingContent(true);
     await axios
-      .get(`http://localhost:8080/api/v1/users/${userData.id}`, {
+      .get(`http://localhost:8080/api/v1/trainings`, {
         headers: {
           Authorization: "Bearer " + user.access_token,
         },
       })
       .then((resp) => {
-        let asd = resp.data.contenido.trainings;
+        let asd = resp.data.contenido;
         asd.forEach((training) => {
-          delete training.userId;
           training.status = training.status.replace("_", " ");
           training.creationDate = training.creationDate.slice(0, -16);
           training.creationDate = `${training.creationDate.substring(
@@ -55,8 +53,8 @@ export const MisTrainings = () => {
           }
         });
 
-        localStorage.setItem("trainings", JSON.stringify(asd));
-        resp.status === 200 ? setTrainings(asd) : null;
+        // localStorage.setItem("trainings", JSON.stringify(asd));
+        setTrainings(asd);
         setLoadingContent(false);
         console.log(asd);
       })
@@ -66,18 +64,17 @@ export const MisTrainings = () => {
         setLoadingContent(false);
       });
   };
-
   useEffect(() => {
     getTrainings();
   }, []);
-
   useEffect(() => {
     setFoundTrainings(findSearch(trainings, search));
   }, [search]);
-  if (!loadingContent)
+
+  if (!loadingContent && trainings)
     return (
       <>
-        <h1 className="title ms-10 text-secondary">Mis trainings</h1>
+        <h1 className="title ms-10 text-secondary">Todas las trainings</h1>
         <div className="mt-8 mb-20">
           <div className="w-[90%] mx-auto">
             <div className="rounded-lg overflow-hidden border">
@@ -99,32 +96,32 @@ export const MisTrainings = () => {
                 </label>
               </div>
               <table
-                className="w-full text-sm text-left text-gray-500"
+                className="admin-table w-full text-sm text-left text-gray-500"
                 id="user-trainings-table"
               >
                 <thead className="text-sm text-gray-700 uppercase bg-gray-100">
                   <tr>
+                    <th scope="col">
+                      <div>Descripción</div>
+                    </th>
                     <th scope="col">
                       <div className="flex gap-2 items-center">
                         Área
                         <div className="flex flex-col">
                           <button
                             className="hover:text-gray-400 order-table"
-                            onClick={(e) => sortTable(0, "asc", e.target)}
+                            onClick={(e) => sortTable(1, "asc", e.target)}
                           >
                             <BsChevronUp size={12} />
                           </button>
                           <button
                             className="hover:text-gray-400 order-table"
-                            onClick={(e) => sortTable(0, "desc", e.target)}
+                            onClick={(e) => sortTable(1, "desc", e.target)}
                           >
                             <BsChevronDown size={12} />
                           </button>
                         </div>
                       </div>
-                    </th>
-                    <th scope="col">
-                      <div>Descripción</div>
                     </th>
                     <th scope="col">
                       <div>Link</div>
@@ -149,6 +146,9 @@ export const MisTrainings = () => {
                       </div>
                     </th>
                     <th scope="col">
+                      <div>Usuario</div>
+                    </th>
+                    <th scope="col">
                       <div>Mentor</div>
                     </th>
                     <th scope="col">
@@ -157,13 +157,13 @@ export const MisTrainings = () => {
                         <div className="flex flex-col">
                           <button
                             className="hover:text-gray-400 order-table"
-                            onClick={(e) => sortTable(5, "asc", e.target)}
+                            onClick={(e) => sortTable(6, "asc", e.target)}
                           >
                             <BsChevronUp size={12} />
                           </button>
                           <button
                             className="hover:text-gray-400 order-table"
-                            onClick={(e) => sortTable(5, "desc", e.target)}
+                            onClick={(e) => sortTable(6, "desc", e.target)}
                           >
                             <BsChevronDown size={12} />
                           </button>
@@ -223,10 +223,10 @@ export const MisTrainings = () => {
                         <>
                           <tr key={soli.id} className={`bg-white border-b`}>
                             <td scope="col">
-                              <span>{soli.area}</span>
+                              <span>{soli.title}</span>
                             </td>
                             <td scope="col">
-                              <span>{soli.title}</span>
+                              <span>{soli.area}</span>
                             </td>
                             <td scope="col">
                               {soli.link ? (
@@ -239,6 +239,30 @@ export const MisTrainings = () => {
                             </td>
                             <td scope="col">
                               <span>{soli.status}</span>
+                            </td>
+                            <td scope="col">
+                              <span>
+                                {soli.userId ? (
+                                  <div className="flex gap-1">
+                                    {soli.userId.hasTeams && (
+                                      <a
+                                        href={`https://teams.microsoft.com/l/chat/0/0?users=${soli.userId.email}`}
+                                      >
+                                        <BsMicrosoftTeams
+                                          size={22}
+                                          color="#333"
+                                        ></BsMicrosoftTeams>
+                                      </a>
+                                    )}
+                                    <span>
+                                      {soli.userId.firstname +
+                                        soli.userId.lastname}
+                                    </span>
+                                  </div>
+                                ) : (
+                                  "-"
+                                )}
+                              </span>
                             </td>
                             <td scope="col">
                               <span>

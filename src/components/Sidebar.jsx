@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { SidebarIcon } from "./SidebarIcon";
-import { FaHome } from "react-icons/fa";
+import { FaHome, FaUserFriends } from "react-icons/fa";
 import { FaBookReader } from "react-icons/fa";
 import { FaEnvelope } from "react-icons/fa";
 import { FaPlusCircle } from "react-icons/fa";
@@ -16,14 +16,14 @@ export const Sidebar = () => {
   const { logout, userData } = useContext(UserContext);
   if (userData) {
     return (
-      <div className="sidebar fixed top-0 left-0 w-20 flex flex-col items-center h-full bg-dfGrey py-8">
+      <div className="sidebar fixed top-0 left-0 w-20 flex flex-col items-center h-full bg-dfGrey py-8 z-[2]">
         {/* <SidebarIcon icon={<FaBars size={32} />} /> */}
         <div className="userIcons">
-          <Link className="sidebarIcon group" to={"/home"}>
-            <SidebarIcon tooltip={"Inicio"} icon={<FaHome size={28} />} />
-          </Link>
           {userData.role === "USER" && (
             <>
+              <Link className="sidebarIcon group" to={"/home"}>
+                <SidebarIcon tooltip={"Inicio"} icon={<FaHome size={28} />} />
+              </Link>
               <Link className="sidebarIcon group" to="my-trainings">
                 <SidebarIcon
                   tooltip={"Mis solicitudes"}
@@ -57,19 +57,19 @@ export const Sidebar = () => {
 
           {userData.role === "ADMIN" && (
             <>
-              <Link className="sidebarIcon group" to="">
+              <Link className="sidebarIcon group" to="/adminTrainings">
                 <SidebarIcon
-                  tooltip={"Solicitudes"}
+                  tooltip={"Todas las trainings"}
                   icon={<FaInbox size={28} />}
                 />
               </Link>
-              {/* <Link className="sidebarIcon group" to="">
+              <Link className="sidebarIcon group" to="/users">
                 <SidebarIcon
-                  tooltip={"Estadisticas"}
-                  icon={<FaChartBar size={28} />}
+                  tooltip={"Usuarios"}
+                  icon={<FaUserFriends size={28} />}
                 />
-              </Link> */}
-              <Link className="sidebarIcon group" to="">
+              </Link>
+              <Link className="sidebarIcon group" to="licences">
                 <SidebarIcon
                   tooltip={"Licencias"}
                   icon={<FaFolder size={28} />}
@@ -78,10 +78,14 @@ export const Sidebar = () => {
             </>
           )}
         </div>
-        <Link className="sidebarIcon group mt-auto" to="">
+        {/* <Link className="sidebarIcon group mt-auto" to="">
           <SidebarIcon tooltip={"Ajustes"} icon={<IoMdSettings size={28} />} />
-        </Link>
-        <Link className="sidebarIcon group" to="" onClick={() => logout()}>
+        </Link> */}
+        <Link
+          className="sidebarIcon group mt-auto"
+          to=""
+          onClick={() => logout()}
+        >
           <SidebarIcon
             tooltip={"Cerrar sesión"}
             icon={
