@@ -12,6 +12,7 @@ import {
 import { sortTable } from "../helpers/sortTable";
 import { findSearch } from "../helpers/search";
 import { Link, useNavigate } from "react-router-dom";
+import formatDate from "../helpers/formatDate";
 
 export const MisTrainings = () => {
   const [trainings, setTrainings] = useState([]);
@@ -40,6 +41,7 @@ export const MisTrainings = () => {
         asd.forEach((training) => {
           delete training.userId;
           training.status = training.status.replace("_", " ");
+          /*
           training.creationDate = training.creationDate.slice(0, -16);
           training.creationDate = `${training.creationDate.substring(
             8,
@@ -48,7 +50,8 @@ export const MisTrainings = () => {
             5,
             7
           )}-${training.creationDate.substring(0, 4)}`;
-
+          */
+          training.creationDate = formatDate(training.creationDate);
           if (training.mentorId) {
             training.mentorId.name = `${training.mentorId.firstname} ${training.mentorId.lastname}`;
             delete training.mentorId.role;
@@ -255,7 +258,7 @@ export const MisTrainings = () => {
                                       </a>
                                     )}
                                     <span>
-                                      {soli.mentorId.firstname +
+                                      {soli.mentorId.firstname + ' ' +
                                         soli.mentorId.lastname}
                                     </span>
                                   </div>
