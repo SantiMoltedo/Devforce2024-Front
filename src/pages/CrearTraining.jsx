@@ -96,7 +96,7 @@ export const CrearTraining = () => {
           <input
             id="solicitud-descripcion"
             type="text"
-            placeholder="Necsito aprender React"
+            placeholder="Necesito aprender React"
             name="titulo"
             value={titulo}
             onChange={(ev) => {
