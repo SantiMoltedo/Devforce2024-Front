@@ -83,20 +83,20 @@ export const Training = () => {
     let body;
     if (userData.role.toLowerCase() == "user") {
       action == "accept"
-        ? (body = { status: "PENDIENTE_ADMIN" })
-        : (body = { status: "RECHAZADA" });
+        ? (body = { status: "PENDING_ADMIN" })
+        : (body = { status: "REJECTED" });
     }
 
     if (userData.role.toLowerCase() == "mentor") {
       action == "accept"
-        ? (body = { status: "PENDIENTE_USER", comment, link, days })
-        : (body = { status: "RECHAZADA", comment });
+        ? (body = { status: "PENDING_USER", comment, link, days })
+        : (body = { status: "REJECTED", comment });
     }
 
     if (userData.role.toLowerCase() == "admin") {
       action == "accept"
-        ? (body = { status: "APROBADA" })
-        : (body = { status: "RECHAZADA" });
+        ? (body = { status: "APPROVED" })
+        : (body = { status: "REJECTED" });
     }
     console.log(
       `http://localhost:8080/api/v1/trainings/${id}/${userData.role.toLowerCase()}`,
@@ -141,7 +141,7 @@ export const Training = () => {
                   <b>Training del área:</b> {training.area.toLowerCase()}
                 </p>
                 <p>
-                  <b>Ceada por: </b>
+                  <b>Creada por: </b>
                   {training.userId.firstname + " " + training.userId.lastname}
                 </p>
                 <p>
@@ -167,7 +167,7 @@ export const Training = () => {
                         </a>
                       )}
                       <span>
-                        {training.mentorId.firstname +
+                        {training.mentorId.firstname + ' ' +
                           training.mentorId.lastname}
                       </span>
                     </div>
@@ -190,7 +190,7 @@ export const Training = () => {
                         </a>
                       )}
                       <span>
-                        {training.adminId.firstname + training.adminId.lastname}
+                        {training.adminId.firstname + ' ' + training.adminId.lastname}
                       </span>
                     </div>
                   ) : (
@@ -226,7 +226,7 @@ export const Training = () => {
                   );
                 })}
               </div>
-              {training.status == `pendiente ${userData.role.toLowerCase()}` &&
+              {training.status == `pending ${userData.role.toLowerCase()}` &&
                 userData.role !== "MENTOR" && (
                   <div className="mt-8 max-w-xl flex justify-end gap-4 mb-16">
                     <button
@@ -244,7 +244,7 @@ export const Training = () => {
                   </div>
                 )}
             </div>
-            {training.status == `pendiente ${userData.role.toLowerCase()}` &&
+            {training.status == `pending ${userData.role.toLowerCase()}` &&
             userData.role === "MENTOR" ? (
               <div className="flex-1">
                 <form
